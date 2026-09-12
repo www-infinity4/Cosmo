@@ -1,0 +1,48 @@
+{
+  "program": {
+    "id": "channel-program-episode",
+    "title": "Program title",
+    "source": {
+      "type": "authorized-transcript",
+      "url": "https://example.com/source",
+      "retrievedAt": "2026-09-12T00:00:00Z"
+    }
+  },
+  "moments": [
+    {
+      "id": "scene-001",
+      "start": 0,
+      "end": 42,
+      "transcript": "Timestamped transcript text supplied by the channel indexing pipeline.",
+      "setting": "A newsroom set during a live broadcast.",
+      "actions": ["A host introduces the main subject."],
+      "themes": ["public information", "decision making"],
+      "entities": [
+        {
+          "name": "Host",
+          "type": "character-or-presenter",
+          "description": "The person currently guiding the scene."
+        }
+      ],
+      "objects": [
+        {
+          "name": "desk microphone",
+          "description": "Visible broadcast equipment."
+        }
+      ],
+      "connections": [
+        {
+          "from": "desk microphone",
+          "fromType": "object",
+          "relationship": "supports",
+          "to": "broadcasting",
+          "toType": "industry"
+        }
+      ],
+      "source": {
+        "kind": "authorized-index",
+        "confidence": 0.94
+      }
+    }
+  ]
+}
