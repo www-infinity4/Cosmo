@@ -141,6 +141,11 @@
     async ask(message, proactive) {
       message = safe(message).trim();
       if (!message && !proactive) return;
+      if (message && this.options.editPage && /\b(page|background|heading|layout|colour|color|font|button|text)\b/i.test(message) && /^(edit|change|update|make|redesign|move|remove|add)\b/i.test(message)) {
+        this.add("user", message);
+        await this.editPage(message);
+        return;
+      }
       if (message) this.add("user", message);
       const payload = this.currentPayload(message || "Offer one concise, useful observation or question about the current scene.");
       this.setBusy(true);
@@ -195,6 +200,14 @@
       finally { this.setBusy(false); }
     }
 
+    async editPage(request) {
+      if (!this.options.editPage) return this.add("cosmo", "Page editing is not connected for this channel yet.");
+      try {
+        const result = await this.options.editPage({ request: safe(request), program: this.program, playback: this.playback });
+        if (result && result.message) this.add("cosmo", safe(result.message));
+      } catch (_) { this.add("cosmo", "I could not open the page editor. Nothing on this page was changed."); }
+    }
+
     add(role, text, url) {
       this.state.messages.push({ role, text, url: url || "", at: Date.now(), seconds: this.playback ? this.playback.seconds : 0 });
       this.state.messages = this.state.messages.slice(-100);
@@ -226,12 +239,13 @@
 
     render() {
       this.root.classList.add("cosmo");
-      this.root.innerHTML = '<header><div><small id="cosmoMoment">WATCH COMPANION</small><strong id="cosmoTitle">Cosmo</strong></div><button class="cosmo-close" type="button" aria-label="Close Cosmo">×</button></header><div class="cosmo-log" aria-live="polite"></div><div class="cosmo-prompts"></div><div class="cosmo-actions"><button type="button" data-action="discover">Find something from this scene</button><button type="button" data-action="card">Make my moment card</button></div><form><textarea rows="2" placeholder="Ask Cosmo about what you’re watching" aria-label="Ask Cosmo"></textarea><button type="submit">Ask</button></form>';
+      this.root.innerHTML = '<header><div><small id="cosmoMoment">WATCH COMPANION</small><strong id="cosmoTitle">Cosmo</strong></div><button class="cosmo-close" type="button" aria-label="Close Cosmo">×</button></header><div class="cosmo-log" aria-live="polite"></div><div class="cosmo-prompts"></div><div class="cosmo-actions"><button type="button" data-action="edit">Edit this page</button><button type="button" data-action="discover">Find something from this scene</button><button type="button" data-action="card">Make my moment card</button></div><form><textarea rows="2" placeholder="Ask Cosmo—or tell him to edit this page" aria-label="Ask Cosmo"></textarea><button type="submit">Ask</button></form>';
       this.title = this.root.querySelector("#cosmoTitle"); this.moment = this.root.querySelector("#cosmoMoment"); this.log = this.root.querySelector(".cosmo-log"); this.prompts = this.root.querySelector(".cosmo-prompts"); this.input = this.root.querySelector("textarea"); this.send = this.root.querySelector('form button[type="submit"]');
     }
 
     bind() {
       this.root.querySelector("form").addEventListener("submit", e => { e.preventDefault(); const value = this.input.value; this.input.value = ""; this.ask(value); });
+      this.root.querySelector('[data-action="edit"]').addEventListener("click", () => this.editPage(""));
       this.root.querySelector('[data-action="discover"]').addEventListener("click", () => this.discover());
       this.root.querySelector('[data-action="card"]').addEventListener("click", () => this.createCard());
       this.root.querySelector(".cosmo-close").addEventListener("click", () => this.root.toggleAttribute("hidden"));

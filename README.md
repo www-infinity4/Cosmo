@@ -10,6 +10,7 @@ Cosmo is the shared, repo-driven companion for Infinity TV channels. Each channe
 - Ask or answer grounded questions during a watch without talking over the program.
 - Offer governed product discovery only when it is genuinely relevant and sourced live.
 - Build a unique front/back card from an authorized frame or still, with program/time provenance.
+- Open a governed editor for the page being viewed. Cosmo previews declarative text/style changes, rejects executable markup, and waits for visible confirmation before saving the local page version.
 
 ## Channel hookup
 
